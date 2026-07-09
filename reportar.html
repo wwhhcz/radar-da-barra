@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Reportar Preço e Validade · Radar da Barra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .painel-reportar { background: #fff; border: 2px solid #222; border-radius: 8px; padding: 2rem; margin-top: 1.5rem; }
+  .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin-bottom: 1.5rem; }
+  
+  .campo-grupo { display: flex; flex-direction: column; gap: 0.4rem; }
+  .campo-grupo label { font-weight: 700; font-size: 0.9rem; color: #222; }
+  .campo-grupo input, .campo-grupo select, .campo-grupo textarea {
+    padding: 0.75rem; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 0.95rem;
+  }
+  .campo-grupo input:focus, .campo-grupo select:focus, .campo-grupo textarea:focus {
+    outline: none; border-color: #222; box-shadow: 0 0 0 2px #eee;
+  }
+
+  .alerta-validade { background: #fff3cd; border-left: 5px solid #ffc107; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem; font-size: 0.9rem; color: #856404; }
+  
+  .btn-enviar { background: #222; color: #fff; border: none; padding: 0.9rem 1.8rem; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 1rem; width: 100%; transition: background 0.2s; }
+  .btn-enviar:hover { background: #444; }
+
+  .mensagem-sucesso { display: none; background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 6px; text-align: center; margin-top: 1rem; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="topo">
+  <div class="topo__marca">
+    <a href="index.html" class="marca">
+      <span class="marca__onda" aria-hidden="true">〜</span>
+      <span class="marca__texto">Radar <strong>da Barra</strong></span>
+    </a>
+    <span class="topo__selo">Barra do Ceará · Fortaleza-CE</span>
+  </div>
+  <nav class="topo__nav">
+    <a href="precos.html">Preços</a>
+    <a href="mercados.html">Mercados</a>
+    <a href="tutorial.html">Tutorial</a>
+    <a href="finalidade.html">Finalidade</a>
+    <a href="reportar.html" class="botao botao--sol">Reportar preço</a>
+  </nav>
+</header>
+
+<main id="conteudo" style="max-width: 850px; margin: 2rem auto; padding: 0 1rem;">
+
+  <section class="cabecalho-pagina">
+    <span class="eyebrow" style="color: #666; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">Colaboração Comunitária</span>
+    <h1>Reportar Preço ou Validade</h1>
+    <p>Encontrou um preço diferente, uma promoção de vencimento próximo ou produto fora do prazo na Barra do Ceará? Envie abaixo para atualizarmos o radar!</p>
+  </section>
+
+  <div class="alerta-validade">
+    <strong>📢 Atenção à Validade:</strong> Produtos perto do vencimento com desconto ajudam na economia comunitária, mas itens **vencidos** nas prateleiras devem ser alertados para proteger a saúde dos moradores!
+  </div>
+
+  <form class="painel-reportar" id="formReportar" onsubmit="enviarRelato(event)">
+    
+    <div class="grid-form">
+      <!-- Tipo de Relato -->
+      <div class="campo-grupo" style="grid-column: 1 / -1;">
+        <label for="tipoRelato">O que você deseja reportar? *</label>
+        <select id="tipoRelato" required onchange="ajustarCampos()">
+          <option value="preco">🏷️ Alteração ou Erro de Preço</option>
+          <option value="desconto_vencimento">⏳ Promoção de Vencimento Próximo (Desconto)</option>
+          <option value="vencido">⚠️ Produto Vencido na Prateleira</option>
+        </select>
+      </div>
+
+      <!-- Mercado -->
+      <div class="campo-grupo">
+        <label for="mercado">Estabelicimento / Mercado *</label>
+        <select id="mercado" required>
+          <option value="">Selecione o mercado...</option>
+          <option value="Atacadão da Barra">Atacadão da Barra</option>
+          <option value="Supermercado do Povo">Supermercado do Povo</option>
+          <option value="Center Box">Center Box Supermercados</option>
+          <option value="Comercial São José">Comercial São José</option>
+          <option value="Rede Baratão">Rede Baratão</option>
+          <option value="Mercadinho São Francisco">Mercadinho São Francisco</option>
+          <option value="Mercadinho da Esquina">Mercadinho da Esquina</option>
+          <option value="Hortifruti da Praça">Hortifruti da Praça</option>
+          <option value="Açougue Central">Açougue Central</option>
+          <option value="Padaria Pão de Ouro">Padaria Pão de Ouro</option>
+          <option value="Outro">Outro estabelecimento da Barra</option>
+        </select>
+      </div>
+
+      <!-- Nome do Alimento -->
+      <div class="campo-grupo">
+        <label for="nomeProduto">Nome do Produto / Alimento *</label>
+        <input type="text" id="nomeProduto" placeholder="Ex: Leite Integral 1L, Café 250g..." required>
+      </div>
+
+      <!-- Preço Encontrado -->
+      <div class="campo-grupo" id="grupoPreco">
+        <label for="precoEncontrado">Preço Encontrado (R$) *</label>
+        <input type="number" step="0.01" id="precoEncontrado" placeholder="0.00">
+      </div>
+
+      <!-- Data de Data/Validade -->
+      <div class="campo-grupo" id="grupoValidade">
+        <label for="dataValidade">Data de Validade (se aplicável)</label>
+        <input type="date" id="dataValidade">
+      </div>
+    </div>
+
+    <!-- Foto / Comprovante -->
+    <div class="campo-grupo" style="margin-bottom: 1.2rem;">
+      <label for="foto">Foto da Etiqueta, Cupom ou Produto (Opcional)</label>
+      <input type="file" id="foto" accept="image/*">
+    </div>
+
+    <!-- Detalhes / Observação -->
+    <div class="campo-grupo" style="margin-bottom: 1.5rem;">
+      <label for="observacao">Observações Adicionais</label>
+      <textarea id="observacao" rows="3" placeholder="Ex: Estava na gôndeola promocional de entrada / Apenas 5 unidades restantes..."></textarea>
+    </div>
+
+    <button type="submit" class="btn-enviar">Enviar Relato para Verificação</button>
+
+    <div class="mensagem-sucesso" id="msgSucesso">
+      ✅ Relato enviado com sucesso! Nossa equipe irá verificar e atualizar o Radar da Barra em breve. Obrigado por colaborar!
+    </div>
+  </form>
+
+</main>
+
+<footer class="rodape">
+  <div class="rodape__conteudo">
+    
+    <!-- COLUNA 1: IDENTIFICAÇÃO -->
+    <div class="rodape__coluna">
+      <div style="font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">
+        〜 Radar <strong style="color: #f4b400;">da Barra</strong>
+      </div>
+      <p>Monitoramento comunitário e comparativo de preços de itens essenciais na Barra do Ceará.</p>
+      <span class="rodape__selo-local">Barra do Ceará · Fortaleza-CE</span>
+    </div>
+
+    <!-- COLUNA 2: NAVEGAÇÃO PRINCIPAL -->
+    <div class="rodape__coluna">
+      <h4>Navegação</h4>
+      <ul class="rodape__links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="precos.html">Preços e Cesta Básica</a></li>
+        <li><a href="mercados.html">Mercados Mapeados</a></li>
+        <li><a href="tutorial.html">Como Usar</a></li>
+        <li><a href="finalidade.html">Sobre o Projeto</a></li>
+      </ul>
+    </div>
+
+    <!-- COLUNA 3: COLABORAÇÃO -->
+    <div class="rodape__coluna">
+      <h4>Ação Cidadã</h4>
+      <ul class="rodape__links">
+        <li><a href="reportar.html">Reportar Preço ou Validade</a></li>
+        <li><a href="https://www.mpce.mp.br/decon/" target="_blank" rel="noopener">DECON / PROCON Ceará</a></li>
+        <li><a href="tutorial.html#faq">Perguntas Frequentes</a></li>
+      </ul>
+    </div>
+
+    <!-- COLUNA 4: TRANSPARÊNCIA -->
+    <div class="rodape__coluna">
+      <h4>Transparência</h4>
+      <p>Projeto de caráter comunitário e acadêmico, focado no acesso livre à informação de preços da região.</p>
+    </div>
+
+  </div>
+
+  <!-- BASE -->
+  <div class="rodape__base">
+    <span>© 2026 Radar da Barra · Projeto sem fins comerciais</span>
+    <div style="display: flex; gap: 1.5rem;">
+      <a href="termos.html">Termos de Uso</a>
+      <a href="finalidade.html">Privacidade</a>
+    </div>
+  </div>
+</footer>
+<script>
+function ajustarCampos() {
+  const tipo = document.getElementById('tipoRelato').value;
+  const campoPreco = document.getElementById('grupoPreco');
+  const campoValidade = document.getElementById('grupoValidade');
+
+  if (tipo === 'vencido') {
+    campoPreco.style.display = 'none';
+    campoValidade.style.display = 'flex';
+  } else {
+    campoPreco.style.display = 'flex';
+    campoValidade.style.display = 'flex';
+  }
+}
+
+function enviarRelato(event) {
+  event.preventDefault();
+  const msg = document.getElementById('msgSucesso');
+  msg.style.display = 'block';
+  
+  // Limpa o formulário após enviar
+  setTimeout(() => {
+    document.getElementById('formReportar').reset();
+    ajustarCampos();
+  }, 1000);
+}
+</script>
+</body>
+</html>

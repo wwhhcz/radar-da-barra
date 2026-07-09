@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Comparativo de Preços · Radar da Barra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Base de Animação de Rolagem */
+  .revelar {
+    opacity: 0;
+    transform: translateY(25px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .revelar.ativo {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Painel Destaque da Cesta Básica */
+  .painel-cesta {
+    background: linear-gradient(135deg, #111111 0%, #1c1c28 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .cesta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cesta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .cesta-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1.2rem;
+    backdrop-filter: blur(6px);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .cesta-card:hover {
+    transform: translateY(-4px);
+    border-color: #f4b400;
+  }
+
+  .cesta-card--destaque {
+    border-color: #f4b400;
+    background: rgba(244, 180, 0, 0.08);
+  }
+
+  .cesta-card .rotulo {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cesta-card .valor {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0.4rem 0;
+  }
+
+  .cesta-card .mercado {
+    font-size: 0.85rem;
+    color: #ddd;
+  }
+
+  /* Painel de Filtros */
+  .painel-filtros {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin: 1.5rem 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  }
+
+  .campo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .campo-filtro label {
+    font-size: 0.8rem;
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    color: #555;
+    font-weight: bold;
+  }
+
+  .campo-filtro input, .campo-filtro select {
+    padding: 0.65rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: #fff;
+  }
+
+  .campo-filtro input:focus, .campo-filtro select:focus {
+    outline: none;
+    border-color: #222;
+  }
+
+  /* Tabela Interativa */
+  .tabela-container {
+    overflow-x: auto;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+  }
+
+  .tabela-precos {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.92rem;
+  }
+
+  .tabela-precos th {
+    background: #f8f9fa;
+    padding: 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid #ddd;
+    color: #333;
+  }
+
+  .tabela-precos td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+
+  .tabela-precos tr {
+    transition: background 0.2s ease;
+  }
+
+  .tabela-precos tr:hover {
+    background: #fcfcfc;
+  }
+
+  /* Tags de Variacao */
+  .tag-variacao {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .tag-variacao.reducao {
+    background: #e6f4ea;
+    color: #137333;
+  }
+
+  .tag-variacao.aumento {
+    background: #fce8e6;
+    color: #c5221f;
+  }
+
+  .tag-variacao.estavel {
+    background: #f1f3f4;
+    color: #5f6368;
+  }
+
+  .tag-cesta {
+    display: inline-block;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-family: 'Space Mono', monospace;
+    background: #fff8e1;
+    color: #b78103;
+    border: 1px solid #ffe082;
+    margin-left: 0.5rem;
+  }
+
+  .preco-antigo {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 0.85rem;
+    margin-right: 0.4rem;
+  }
+
+  .preco-atual {
+    font-weight: bold;
+    color: #111;
+  }
+
+  /* Contador e feedback */
+  .resumo-busca {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 1rem;
+    font-family: 'Space Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="topo">
+  <div class="topo__marca">
+    <a href="index.html" class="marca">
+      <span class="marca__onda" aria-hidden="true">〜</span>
+      <span class="marca__texto">Radar <strong>da Barra</strong></span>
+    </a>
+    <span class="topo__selo">Barra do Ceará · Fortaleza-CE</span>
+  </div>
+  <nav class="topo__nav">
+    <a href="precos.html" class="ativo">Preços</a>
+    <a href="mercados.html">Mercados</a>
+    <a href="tutorial.html">Tutorial</a>
+    <a href="finalidade.html">Finalidade</a>
+    <a href="reportar.html" class="botao botao--sol">Reportar preço</a>
+  </nav>
+</header>
+
+<main id="conteudo" style="max-width: 1100px; margin: 2rem auto; padding: 0 1rem;">
+
+  <section class="cabecalho-pagina revelar">
+    <span class="eyebrow" style="color: #666; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">Atualização Diária</span>
+    <h1>Comparativo de Preços na Barra</h1>
+    <p>Consulte a cesta básica padronizada e filtre os alimentos monitorados nos estabelecimentos do bairro.</p>
+  </section>
+
+  <!-- PAINEL DESTAQUE DA CESTA BÁSICA -->
+  <section class="painel-cesta revelar">
+    <div class="cesta-header">
+      <div>
+        <span style="font-size: 0.8rem; font-family: 'Space Mono', monospace; color: #f4b400; text-transform: uppercase; letter-spacing: 1px;">Monitor de Custo de Vida</span>
+        <h2 style="font-size: 1.6rem; margin: 0.3rem 0 0; color: #fff;">Cesta Básica Comunitária</h2>
+      </div>
+      <span style="font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #aaa; background: rgba(255,255,255,0.1); padding: 0.4rem 0.8rem; border-radius: 4px;">12 Itens Essenciais</span>
+    </div>
+
+    <div class="cesta-grid">
+      <div class="cesta-card cesta-card--destaque">
+        <span class="rotulo">Menor Valor Encontrado</span>
+        <div class="valor" style="color: #f4b400;">R$ 138,50</div>
+        <div class="mercado">Atacadão da Barra</div>
+      </div>
+
+      <div class="cesta-card">
+        <span class="rotulo">Média do Bairro</span>
+        <div class="valor">R$ 146,80</div>
+        <div class="mercado">Baseado em 6 mercados</div>
+      </div>
+
+      <div class="cesta-card">
+        <span class="rotulo">Variação Mensal</span>
+        <div class="valor" style="color: #81c995;">- 2.4%</div>
+        <div class="mercado">Economia média de R$ 8,30</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAINEL DE FILTROS INTERATIVOS -->
+  <section class="painel-filtros revelar">
+    <div class="campo-filtro">
+      <label for="buscaNome">Buscar Alimento</label>
+      <input type="text" id="buscaNome" placeholder="Ex: Feijão, Arroz, Leite..." oninput="filtrarPrecos()">
+    </div>
+
+    <div class="campo-filtro">
+      <label for="filtroMercado">Filtrar por Mercado</label>
+      <select id="filtroMercado" onchange="filtrarPrecos()">
+        <option value="">Todos os Mercados</option>
+        <option value="Atacadão da Barra">Atacadão da Barra</option>
+        <option value="Center Box">Center Box</option>
+        <option value="Supermercado do Povo">Supermercado do Povo</option>
+        <option value="Mercadinho São Francisco">Mercadinho São Francisco</option>
+        <option value="Frangolândia">Frangolândia</option>
+        <option value="Comercial São José">Comercial São José</option>
+      </select>
+    </div>
+
+    <div class="campo-filtro">
+      <label for="filtroStatus">Tendência do Preço</label>
+      <select id="filtroStatus" onchange="filtrarPrecos()">
+        <option value="">Todas as Tendências</option>
+        <option value="reducao">Apenas Preços que Baixaram</option>
+        <option value="aumento">Apenas Preços que Subiram</option>
+        <option value="estavel">Preços Estáveis</option>
+      </select>
+    </div>
+
+    <div class="campo-filtro">
+      <label for="filtroCesta">Categoria</label>
+      <select id="filtroCesta" onchange="filtrarPrecos()">
+        <option value="">Todos os Produtos</option>
+        <option value="sim">Somente Cesta Básica</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="resumo-busca revelar" id="resumoContador">Exibindo todos os itens</div>
+
+  <!-- TABELA DINÂMICA DE PREÇOS -->
+  <div class="tabela-container revelar">
+    <table class="tabela-precos">
+      <thead>
+        <tr>
+          <th>Produto / Alimento</th>
+          <th>Mercado</th>
+          <th>Preço Anterior</th>
+          <th>Preço Atual</th>
+          <th>Variação</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabelaPrecos">
+        <!-- Preenchido via JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer class="rodape">
+  <div class="rodape__conteudo">
+    <div class="rodape__coluna">
+      <div style="font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">
+        〜 Radar <strong style="color: #f4b400;">da Barra</strong>
+      </div>
+      <p>Monitoramento comunitário e comparativo de preços de itens essenciais na Barra do Ceará.</p>
+      <span class="rodape__selo-local">Barra do Ceará · Fortaleza-CE</span>
+    </div>
+
+    <div class="rodape__coluna">
+      <h4>Navegação</h4>
+      <ul class="rodape__links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="precos.html">Preços e Cesta Básica</a></li>
+        <li><a href="mercados.html">Mercados Mapeados</a></li>
+        <li><a href="tutorial.html">Como Usar</a></li>
+        <li><a href="finalidade.html">Sobre o Projeto</a></li>
+      </ul>
+    </div>
+
+    <div class="rodape__coluna">
+      <h4>Ação Cidadã</h4>
+      <ul class="rodape__links">
+        <li><a href="reportar.html">Reportar Preço ou Validade</a></li>
+        <li><a href="https://www.mpce.mp.br/decon/" target="_blank" rel="noopener">DECON / PROCON Ceará</a></li>
+        <li><a href="tutorial.html#faq">Perguntas Frequentes</a></li>
+      </ul>
+    </div>
+
+    <div class="rodape__coluna">
+      <h4>Transparência</h4>
+      <p>Projeto de caráter comunitário e acadêmico, focado no acesso livre à informação de preços da região.</p>
+    </div>
+  </div>
+
+  <div class="rodape__base">
+    <span>© 2026 Radar da Barra · Projeto sem fins comerciais</span>
+    <div style="display: flex; gap: 1.5rem;">
+      <a href="termos.html">Termos de Uso</a>
+      <a href="finalidade.html">Privacidade</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// BASE DE DADOS DOS ALIMENTOS COM INDICADOR DE CESTA BÁSICA
+const listaPrecos = [
+  { nome: "Feijão Carioca 1kg", mercado: "Atacadão da Barra", anterior: 8.40, atual: 7.20, status: "reducao", cesta: true },
+  { nome: "Óleo de Soja 900ml", mercado: "Center Box", anterior: 6.80, atual: 5.98, status: "reducao", cesta: true },
+  { nome: "Leite Integral 1L", mercado: "Mercadinho São Francisco", anterior: 5.90, atual: 5.19, status: "reducao", cesta: true },
+  { nome: "Tomate kg", mercado: "Frangolândia", anterior: 7.80, atual: 5.40, status: "reducao", cesta: true },
+  { nome: "Arroz Agulhinha 1kg", mercado: "Supermercado do Povo", anterior: 5.50, atual: 5.99, status: "aumento", cesta: true },
+  { nome: "Açúcar Refinado 1kg", mercado: "Comercial São José", anterior: 4.20, atual: 4.65, status: "aumento", cesta: true },
+  { nome: "Café Torrado 250g", mercado: "Atacadão da Barra", anterior: 9.50, atual: 10.20, status: "aumento", cesta: true },
+  { nome: "Carne Bovina kg (Chã)", mercado: "Center Box", anterior: 32.00, atual: 34.90, status: "aumento", cesta: true },
+  { nome: "Farinha de Mandioca 1kg", mercado: "Mercadinho São Francisco", anterior: 6.00, atual: 6.00, status: "estavel", cesta: true },
+  { nome: "Manteiga 200g", mercado: "Frangolândia", anterior: 10.50, atual: 10.50, status: "estavel", cesta: true },
+  { nome: "Biscoito Cream Cracker 350g", mercado: "Atacadão da Barra", anterior: 4.50, atual: 4.10, status: "reducao", cesta: false },
+  { nome: "Detergente Líquido 500ml", mercado: "Center Box", anterior: 2.30, atual: 2.50, status: "aumento", cesta: false }
+];
+
+function renderizarTabela(dados) {
+  const corpo = document.getElementById('corpoTabelaPrecos');
+  const contador = document.getElementById('resumoContador');
+
+  contador.textContent = `Exibindo ${dados.length} de ${listaPrecos.length} produtos monitorados`;
+
+  if (dados.length === 0) {
+    corpo.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #777; padding: 2rem;">Nenhum alimento encontrado com os filtros selecionados.</td></tr>`;
+    return;
+  }
+
+  corpo.innerHTML = dados.map(item => {
+    let tagClasse = item.status;
+    let tagTexto = "Estável";
+
+    if (item.status === 'reducao') {
+      const diff = ((item.anterior - item.atual) / item.anterior) * 100;
+      tagTexto = `▼ -${diff.toFixed(1)}%`;
+    } else if (item.status === 'aumento') {
+      const diff = ((item.atual - item.anterior) / item.anterior) * 100;
+      tagTexto = `▲ +${diff.toFixed(1)}%`;
+    }
+
+    const seloCesta = item.cesta ? `<span class="tag-cesta">Cesta Básica</span>` : '';
+
+    return `
+      <tr>
+        <td><strong>${item.nome}</strong>${seloCesta}</td>
+        <td>${item.mercado}</td>
+        <td><span class="preco-antigo">R$ ${item.anterior.toFixed(2).replace('.', ',')}</span></td>
+        <td><span class="preco-atual">R$ ${item.atual.toFixed(2).replace('.', ',')}</span></td>
+        <td><span class="tag-variacao ${tagClasse}">${tagTexto}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filtrarPrecos() {
+  const busca = document.getElementById('buscaNome').value.toLowerCase();
+  const mercado = document.getElementById('filtroMercado').value;
+  const status = document.getElementById('filtroStatus').value;
+  const cesta = document.getElementById('filtroCesta').value;
+
+  const filtrados = listaPrecos.filter(item => {
+    const bateBusca = item.nome.toLowerCase().includes(busca);
+    const bateMercado = mercado === "" || item.mercado === mercado;
+    const bateStatus = status === "" || item.status === status;
+    const bateCesta = cesta === "" || (cesta === "sim" && item.cesta);
+    return bateBusca && bateMercado && bateStatus && bateCesta;
+  });
+
+  renderizarTabela(filtrados);
+}
+
+// Animação de Rolagem Suave (IntersectionObserver)
+function inicializarAnimacaoRolagem() {
+  const elementos = document.querySelectorAll('.revelar');
+  const observador = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('ativo');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  elementos.forEach(el => observador.observe(el));
+}
+
+window.onload = () => {
+  renderizarTabela(listaPrecos);
+  inicializarAnimacaoRolagem();
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Preços e Cesta Básica · Radar da Barra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Estilização da Cesta Básica */
+  .painel-cesta { background: #fff; border: 2px solid #222; border-radius: 8px; padding: 1.5rem; margin-bottom: 2.5rem; }
+  .cesta-destaque { background: #e6f4ea; border: 2px solid #137333; border-radius: 6px; padding: 1rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .cesta-destaque .preco-campeao { font-size: 1.8rem; font-weight: 700; color: #137333; }
+  .tabela-cesta { width: 100%; border-collapse: collapse; margin-top: 1rem; text-align: left; }
+  .tabela-cesta th, .tabela-cesta td { padding: 0.75rem; border-bottom: 1px solid #eee; }
+  .tabela-cesta tr.mais-barato { background-color: #f1f8f3; font-weight: 600; }
+  .badge-menor { background: #137333; color: #fff; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase; margin-left: 0.5rem; }
+
+  /* Estilização dos Cards de Produtos */
+  .grade-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .cartao-p { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .cartao-p.aumento { border-left: 5px solid #d93025; }
+  .cartao-p.reducao { border-left: 5px solid #137333; }
+  .tag-variacao { font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+  .aumento .tag-variacao { color: #d93025; }
+  .reducao .tag-variacao { color: #137333; }
+  .precos-box { display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.5rem; }
+  .p-antigo { text-decoration: line-through; color: #777; font-size: 0.9rem; }
+  .p-atual { font-size: 1.25rem; font-weight: 700; color: #111; }
+  
+  /* Botoes de Filtro */
+  .filtros { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .btn-f { background: #f0f0f0; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
+  .btn-f.ativo { background: #222; color: #fff; border-color: #222; }
+</style>
+</head>
+<body>
+
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="topo">
+  <div class="topo__marca">
+    <a href="index.html" class="marca">
+      <span class="marca__onda" aria-hidden="true">〜</span>
+      <span class="marca__texto">Radar <strong>da Barra</strong></span>
+    </a>
+    <span class="topo__selo">Barra do Ceará · Fortaleza-CE</span>
+  </div>
+  <nav class="topo__nav">
+    <a href="precos.html">Preços</a>
+    <a href="mercados.html">Mercados</a>
+    <a href="tutorial.html">Tutorial</a>
+    <a href="finalidade.html">Finalidade</a>
+    <a href="reportar.html" class="botao botao--sol">Reportar preço</a>
+  </nav>
+</header>
+
+<main id="conteudo" style="max-width: 1100px; margin: 2rem auto; padding: 0 1rem;">
+
+  <section class="painel-cesta">
+    <span class="eyebrow" style="color: #666; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">Monitoramento da Região</span>
+    <h2>Cesta Básica no Bairro</h2>
+    <p>Composição padronizada com 12 itens essenciais (Arroz, Feijão, Açúcar, Café, Óleo, Leite, Farinha, Macarrão, Margarina, Carne, Banana e Pão).</p>
+    
+    <div class="cesta-destaque">
+      <div>
+        <span style="font-size: 0.9rem; color: #333;">Onde a cesta está <strong>mais barata</strong> nesta semana:</span>
+        <h3 style="margin: 0.2rem 0; color: #137333;" id="nomeMercadoBarato">Atacadão da Barra</h3>
+      </div>
+      <div class="preco-campeao" id="precoCestaBarata">R$ 138,50</div>
+    </div>
+
+    <table class="tabela-cesta">
+      <thead>
+        <tr>
+          <th>Mercado</th>
+          <th>Bairro / Local</th>
+          <th>Valor Total da Cesta</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabelaCesta">
+        </tbody>
+    </table>
+  </section>
+
+  <section class="cabecalho-pagina">
+    <span class="eyebrow" style="color: #666; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">Monitorando Alimentos</span>
+    <h1>Variações de Preço do Dia</h1>
+    <p>Acompanhe quais itens subiram ou baixaram de preço nos comércios da comunidade.</p>
+  </section>
+
+  <div class="filtros">
+    <button class="btn-f ativo" onclick="filtrar('todos', this)">Todos (30)</button>
+    <button class="btn-f" onclick="filtrar('aumento', this)">▲ Aumentaram</button>
+    <button class="btn-f" onclick="filtrar('reducao', this)">▼ Baixaram</button>
+  </div>
+
+  <div class="grade-produtos" id="gradeProdutos">
+    </div>
+
+</main>
+
+<script>
+// 1. DADOS DA CESTA BÁSICA NOS MERCADOS
+const cestasMercados = [
+  { mercado: "Atacadão da Barra", local: "Av. Leste-Oeste", valor: 138.50 },
+  { mercado: "Supermercado do Povo", local: "Av. Coronel Carvalho", valor: 142.10 },
+  { mercado: "Center Box Supermercados", local: "Av. Coronel Carvalho", valor: 145.80 },
+  { mercado: "Comercial São José", local: "Rua dos Pacajús", valor: 149.90 },
+  { mercado: "Rede Baratão", local: "Av. Radialista João Ramos", valor: 151.30 }
+];
+
+// 2. DADOS DOS 30 ALIMENTOS
+const listaAlimentos = [
+  { nome: "Arroz Agulhinha 1kg", mercado: "Supermercado do Povo", tipo: "aumento", anterior: 5.50, atual: 5.99 },
+  { nome: "Feijão Carioca 1kg", mercado: "Atacadão da Barra", tipo: "reducao", anterior: 8.40, atual: 7.20 },
+  { nome: "Açúcar Refinado 1kg", mercado: "Comercial São José", tipo: "aumento", anterior: 4.20, atual: 4.65 },
+  { nome: "Óleo de Soja 900ml", mercado: "Center Box", tipo: "reducao", anterior: 6.80, atual: 5.98 },
+  { nome: "Café Torrado 250g", mercado: "Rede Baratão", tipo: "aumento", anterior: 9.50, atual: 10.20 },
+  { nome: "Leite Integral 1L", mercado: "Mercadinho São Francisco", tipo: "reducao", anterior: 5.90, atual: 5.19 },
+  { nome: "Farinha de Mandioca 1kg", mercado: "Mercadinho da Esquina", tipo: "aumento", anterior: 6.00, anterior: 6.00, atual: 6.50 },
+  { nome: "Macarrão Espaguete 500g", mercado: "Supermercado Compre Max", tipo: "reducao", anterior: 3.40, atual: 2.95 },
+  { nome: "Margarina 500g", mercado: "Comercial Oliveira", tipo: "aumento", anterior: 5.80, atual: 6.20 },
+  { nome: "Cuscuz Flocado 500g", mercado: "Mercadinho Vila do Mar", tipo: "reducao", anterior: 2.30, atual: 1.99 },
+  { nome: "Sal Refinado 1kg", mercado: "Mercadinho Três Irmãos", tipo: "aumento", anterior: 2.10, atual: 2.40 },
+  { nome: "Biscoito Cream Cracker", mercado: "Supermercado do Povo", tipo: "reducao", anterior: 4.90, atual: 4.30 },
+  { nome: "Extrato de Tomate 340g", mercado: "Atacadão da Barra", tipo: "aumento", anterior: 3.10, atual: 3.50 },
+  { nome: "Frango Resfriado (kg)", mercado: "Açougue Central", tipo: "reducao", anterior: 12.90, atual: 11.50 },
+  { nome: "Carne Bovina kg (Chã)", mercado: "Açougue Central", tipo: "aumento", anterior: 32.00, atual: 34.90 },
+  { nome: "Ovos Brancos (Dúzia)", mercado: "Hortifruti da Praça", tipo: "reducao", anterior: 9.00, atual: 7.99 },
+  { nome: "Banana Prata (kg)", mercado: "Hortifruti da Praça", tipo: "aumento", anterior: 4.50, atual: 5.20 },
+  { nome: "Tomate kg", mercado: "Frangolândia", tipo: "reducao", anterior: 7.80, atual: 5.40 },
+  { nome: "Cebola kg", mercado: "Frangolândia", tipo: "aumento", anterior: 5.20, atual: 6.10 },
+  { nome: "Batata Inglesa kg", mercado: "Center Box", tipo: "reducao", anterior: 6.50, atual: 5.30 },
+  { nome: "Pão Francês kg", mercado: "Padaria Pão de Ouro", tipo: "aumento", anterior: 14.00, atual: 15.20 },
+  { nome: "Queijo Coalho kg", mercado: "Mercadinho da Esquina", tipo: "reducao", anterior: 38.00, atual: 34.90 },
+  { nome: "Presunto Cozido kg", mercado: "Rede Baratão", tipo: "aumento", anterior: 24.00, atual: 26.50 },
+  { nome: "Sardinha em Lata", mercado: "Comercial São José", tipo: "reducao", anterior: 4.50, atual: 3.99 },
+  { nome: "Sabonete em Barra", mercado: "Supermercado do Povo", tipo: "aumento", anterior: 2.20, atual: 2.60 },
+  { nome: "Creme Dental 90g", mercado: "Atacadão da Barra", tipo: "reducao", anterior: 4.10, atual: 3.45 },
+  { nome: "Detergente Líquido", mercado: "Mercadinho Três Irmãos", tipo: "aumento", anterior: 2.50, atual: 2.99 },
+  { nome: "Sabão em Pó 1kg", mercado: "Supermercado Compre Max", tipo: "reducao", anterior: 11.40, atual: 9.80 },
+  { nome: "Papel Higiênico (4 m)", mercado: "Comercial Oliveira", tipo: "aumento", anterior: 5.50, atual: 6.20 },
+  { nome: "Manteiga da Terra 200g", mercado: "Mercadinho Vila do Mar", tipo: "reducao", anterior: 12.50, atual: 10.90 }
+];
+
+// FUNÇÃO PARA RENDERIZAR TABELA DA CESTA BÁSICA
+function renderCesta() {
+  // Ordena pelo menor valor
+  cestasMercados.sort((a, b) => a.valor - b.valor);
+  
+  const menor = cestasMercados[0];
+  document.getElementById('nomeMercadoBarato').textContent = menor.mercado;
+  document.getElementById('precoCestaBarata').textContent = `R$ ${menor.valor.toFixed(2).replace('.', ',')}`;
+
+  const tbody = document.getElementById('corpoTabelaCesta');
+  tbody.innerHTML = cestasMercados.map((item, index) => `
+    <tr class="${index === 0 ? 'mais-barato' : ''}">
+      <td>${item.mercado} ${index === 0 ? '<span class="badge-menor">Mais Barata</span>' : ''}</td>
+      <td>${item.local}</td>
+      <td><strong>R$ ${item.valor.toFixed(2).replace('.', ',')}</strong></td>
+    </tr>
+  `).join('');
+}
+
+// FUNÇÃO PARA RENDERIZAR OS CARD DOS ALIMENTOS
+function renderAlimentos(itens) {
+  const container = document.getElementById('gradeProdutos');
+  container.innerHTML = itens.map(item => `
+    <article class="cartao-p ${item.tipo}">
+      <span class="tag-variacao">${item.tipo === 'aumento' ? '▲ Subiu' : '▼ Baixou'}</span>
+      <h3 style="margin: 0; font-size: 1.1rem;">${item.nome}</h3>
+      <span style="font-size: 0.85rem; color: #555;">${item.mercado}</span>
+      <div class="precos-box">
+        <span class="p-antigo">R$ ${item.anterior.toFixed(2).replace('.', ',')}</span>
+        <span class="p-atual">R$ ${item.atual.toFixed(2).replace('.', ',')}</span>
+      </div>
+    </article>
+  `).join('');
+}
+
+// FILTRO DE BOTOES
+function filtrar(tipo, btn) {
+  document.querySelectorAll('.btn-f').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+
+  if (tipo === 'todos') {
+    renderAlimentos(listaAlimentos);
+  } else {
+    renderAlimentos(listaAlimentos.filter(a => a.tipo === tipo));
+  }
+}
+
+// INICIALIZAÇÃO AO CARREGAR A PÁGINA
+window.onload = () => {
+  renderCesta();
+  renderAlimentos(listaAlimentos);
+};
+
+</script>
+</body>
+</html>

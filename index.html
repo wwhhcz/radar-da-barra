@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Radar da Barra · Monitoramento de Preços</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Base de Animação de Rolagem */
+  .revelar {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .revelar.ativo {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hero Moderno Interativo */
+  .hero-index { 
+    background: linear-gradient(135deg, #111111 0%, #1a1a24 100%); 
+    color: #fff; 
+    padding: 3rem 1.5rem; 
+    border-radius: 16px; 
+    margin-bottom: 2.5rem; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+
+  /* Carrossel de Destaques Rápidos (Passe para o Lado) */
+  .carrossel-wrapper {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carrossel-wrapper::-webkit-scrollbar {
+    height: 6px;
+  }
+  .carrossel-wrapper::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+  }
+  
+  .card-carrossel {
+    flex: 0 0 260px;
+    scroll-snap-align: start;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.2rem;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .card-carrossel:hover {
+    transform: translateY(-5px);
+    border-color: #f4b400;
+  }
+
+  /* Seções de Cards com Efeito Hover */
+  .secao-titulo { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.2rem; border-bottom: 2px solid #222; padding-bottom: 0.5rem; }
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; margin-bottom: 3rem; }
+  
+  .cartao-p { 
+    background: #fff; 
+    border: 1px solid #ddd; 
+    border-radius: 10px; 
+    padding: 1.2rem; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .cartao-p:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  .cartao-p.aumento { border-left: 6px solid #d93025; }
+  .cartao-p.reducao { border-left: 6px solid #137333; }
+  
+  .tag-v { font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+  .aumento .tag-v { color: #d93025; }
+  .reducao .tag-v { color: #137333; }
+  
+  .precos-box { display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.5rem; }
+  .p-antigo { text-decoration: line-through; color: #777; font-size: 0.9rem; }
+  .p-atual { font-size: 1.3rem; font-weight: 700; color: #111; }
+
+  /* Banner Interativo */
+  .banner-comunidade { 
+    background: linear-gradient(135deg, #fffbf0 0%, #fef7e0 100%); 
+    border: 2px dashed #f4b400; 
+    border-radius: 12px; 
+    padding: 2rem 1.5rem; 
+    text-align: center; 
+    margin-bottom: 3rem; 
+  }
+</style>
+</head>
+<body>
+
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="topo">
+  <div class="topo__marca">
+    <a href="index.html" class="marca">
+      <span class="marca__onda" aria-hidden="true">〜</span>
+      <span class="marca__texto">Radar <strong>da Barra</strong></span>
+    </a>
+    <span class="topo__selo">Barra do Ceará · Fortaleza-CE</span>
+  </div>
+  <nav class="topo__nav">
+    <a href="precos.html">Preços</a>
+    <a href="mercados.html">Mercados</a>
+    <a href="tutorial.html">Tutorial</a>
+    <a href="finalidade.html">Finalidade</a>
+    <a href="reportar.html" class="botao botao--sol">Reportar preço</a>
+  </nav>
+</header>
+
+<main id="conteudo" style="max-width: 1100px; margin: 2rem auto; padding: 0 1rem;">
+
+  <!-- HERO INTERATIVO COM CARROSSEL -->
+  <section class="hero-index revelar">
+    <span style="font-size: 0.85rem; font-weight: bold; color: #f4b400; text-transform: uppercase; letter-spacing: 1px;">Radar da Barra do Ceará</span>
+    <h1 style="font-size: 2.4rem; margin: 0.4rem 0 1rem;">Economize nas Compras do Mês</h1>
+    <p style="color: #ccc; max-width: 650px; margin-bottom: 1.8rem;">Arraste para os lados para ver os destaques da semana no bairro:</p>
+    
+    <div class="carrossel-wrapper">
+      <div class="card-carrossel">
+        <span style="font-size: 0.8rem; color: #aaa;">🏆 Cesta Mais Barata</span>
+        <div style="font-size: 1.6rem; font-weight: bold; color: #81c995; margin: 0.4rem 0;">R$ 138,50</div>
+        <span style="font-size: 0.85rem; color: #ddd;">Atacadão da Barra</span>
+      </div>
+      <div class="card-carrossel">
+        <span style="font-size: 0.8rem; color: #aaa;">🔥 Maior Queda Hoje</span>
+        <div style="font-size: 1.6rem; font-weight: bold; color: #81c995; margin: 0.4rem 0;">- 30%</div>
+        <span style="font-size: 0.85rem; color: #ddd;">Tomate kg no Frangolândia</span>
+      </div>
+      <div class="card-carrossel">
+        <span style="font-size: 0.8rem; color: #aaa;">📍 Cobertura</span>
+        <div style="font-size: 1.6rem; font-weight: bold; color: #f4b400; margin: 0.4rem 0;">15 Locais</div>
+        <span style="font-size: 0.85rem; color: #ddd;">Comércios mapeados no bairro</span>
+      </div>
+      <div class="card-carrossel">
+        <span style="font-size: 0.8rem; color: #aaa;">🤝 Colaborativo</span>
+        <div style="font-size: 1.6rem; font-weight: bold; color: #f4b400; margin: 0.4rem 0;">30+ Alertas</div>
+        <span style="font-size: 0.85rem; color: #ddd;">Preços e validades enviadas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESTAQUES: MAIORES QUEDAS -->
+  <section class="revelar">
+    <div class="secao-titulo">
+      <h2 style="font-size: 1.4rem; margin: 0; color: #137333;">▼ Maiores Reduções do Dia</h2>
+      <a href="precos.html" style="font-weight: bold; color: #111; text-decoration: none;">Ver todos baixaram →</a>
+    </div>
+    <div class="grid-cards" id="destaquesReducao">
+      <!-- Injetado via JS -->
+    </div>
+  </section>
+
+  <!-- DESTAQUES: MAIORES AUMENTOS -->
+  <section class="revelar">
+    <div class="secao-titulo">
+      <h2 style="font-size: 1.4rem; margin: 0; color: #d93025;">▲ Maiores Aumentos do Dia</h2>
+      <a href="precos.html" style="font-weight: bold; color: #111; text-decoration: none;">Ver todos subiram →</a>
+    </div>
+    <div class="grid-cards" id="destaquesAumento">
+      <!-- Injetado via JS -->
+    </div>
+  </section>
+
+  <!-- BANNER COLABORATIVO -->
+  <section class="banner-comunidade revelar">
+    <h3 style="margin-top: 0; font-size: 1.4rem;">Viu uma promoção ou item perto do vencimento?</h3>
+    <p style="color: #555; max-width: 600px; margin: 0.5rem auto 1.5rem;">Ajude a construir o Radar da Barra. Envie uma foto do preço ou alerte sobre validades diretamente no nosso formulário.</p>
+    <a href="reportar.html" class="botao botao--sol" style="display: inline-block; padding: 0.85rem 1.8rem; text-decoration: none; font-weight: bold; border-radius: 6px;">Reportar Preço ou Validade</a>
+  </section>
+
+</main>
+
+<footer class="rodape">
+  <div class="rodape__conteudo">
+    
+    <!-- COLUNA 1: IDENTIFICAÇÃO -->
+    <div class="rodape__coluna">
+      <div style="font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">
+        〜 Radar <strong style="color: #f4b400;">da Barra</strong>
+      </div>
+      <p>Monitoramento comunitário e comparativo de preços de itens essenciais na Barra do Ceará.</p>
+      <span class="rodape__selo-local">Barra do Ceará · Fortaleza-CE</span>
+    </div>
+
+    <!-- COLUNA 2: NAVEGAÇÃO PRINCIPAL -->
+    <div class="rodape__coluna">
+      <h4>Navegação</h4>
+      <ul class="rodape__links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="precos.html">Preços e Cesta Básica</a></li>
+        <li><a href="mercados.html">Mercados Mapeados</a></li>
+        <li><a href="tutorial.html">Como Usar</a></li>
+        <li><a href="finalidade.html">Sobre o Projeto</a></li>
+      </ul>
+    </div>
+
+    <!-- COLUNA 3: COLABORAÇÃO -->
+    <div class="rodape__coluna">
+      <h4>Ação Cidadã</h4>
+      <ul class="rodape__links">
+        <li><a href="reportar.html">Reportar Preço ou Validade</a></li>
+        <li><a href="https://www.mpce.mp.br/decon/" target="_blank" rel="noopener">DECON / PROCON Ceará</a></li>
+        <li><a href="tutorial.html#faq">Perguntas Frequentes</a></li>
+      </ul>
+    </div>
+
+    <!-- COLUNA 4: TRANSPARÊNCIA -->
+    <div class="rodape__coluna">
+      <h4>Transparência</h4>
+      <p>Projeto de caráter comunitário e acadêmico, focado no acesso livre à informação de preços da região.</p>
+    </div>
+
+  </div>
+
+  <!-- BASE -->
+  <div class="rodape__base">
+    <span>© 2026 Radar da Barra · Projeto sem fins comerciais</span>
+    <div style="display: flex; gap: 1.5rem;">
+      <a href="termos.html">Termos de Uso</a>
+      <a href="finalidade.html">Privacidade</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const produtosIndex = [
+  { nome: "Feijão Carioca 1kg", mercado: "Atacadão da Barra", tipo: "reducao", anterior: 8.40, atual: 7.20 },
+  { nome: "Óleo de Soja 900ml", mercado: "Center Box", tipo: "reducao", anterior: 6.80, atual: 5.98 },
+  { nome: "Leite Integral 1L", mercado: "Mercadinho São Francisco", tipo: "reducao", anterior: 5.90, atual: 5.19 },
+  { nome: "Tomate kg", mercado: "Frangolândia", tipo: "reducao", anterior: 7.80, atual: 5.40 },
+  
+  { nome: "Arroz Agulhinha 1kg", mercado: "Supermercado do Povo", tipo: "aumento", anterior: 5.50, atual: 5.99 },
+  { nome: "Açúcar Refinado 1kg", mercado: "Comercial São José", tipo: "aumento", anterior: 4.20, atual: 4.65 },
+  { nome: "Café Torrado 250g", mercado: "Rede Baratão", tipo: "aumento", anterior: 9.50, atual: 10.20 },
+  { nome: "Carne Bovina kg (Chã)", mercado: "Açougue Central", tipo: "aumento", anterior: 32.00, atual: 34.90 }
+];
+
+function renderHome() {
+  const containerReducao = document.getElementById('destaquesReducao');
+  const containerAumento = document.getElementById('destaquesAumento');
+
+  const reducoes = produtosIndex.filter(p => p.tipo === 'reducao');
+  const aumentos = produtosIndex.filter(p => p.tipo === 'aumento');
+
+  const criarCard = item => `
+    <article class="cartao-p ${item.tipo}">
+      <span class="tag-v">${item.tipo === 'aumento' ? '▲ Subiu' : '▼ Baixou'}</span>
+      <h3 style="margin: 0; font-size: 1.05rem;">${item.nome}</h3>
+      <span style="font-size: 0.85rem; color: #555;">${item.mercado}</span>
+      <div class="precos-box">
+        <span class="p-antigo">R$ ${item.anterior.toFixed(2).replace('.', ',')}</span>
+        <span class="p-atual">R$ ${item.atual.toFixed(2).replace('.', ',')}</span>
+      </div>
+    </article>
+  `;
+
+  containerReducao.innerHTML = reducoes.map(criarCard).join('');
+  containerAumento.innerHTML = aumentos.map(criarCard).join('');
+}
+
+// Efeito de Animação ao Rolar a Página (IntersectionObserver)
+function inicializarAnimacaoRolagem() {
+  const elementos = document.querySelectorAll('.revelar');
+  const observador = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('ativo');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  elementos.forEach(el => observador.observe(el));
+}
+
+window.onload = () => {
+  renderHome();
+  inicializarAnimacaoRolagem();
+};
+</script>
+</body>
+</html>
